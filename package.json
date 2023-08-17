@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/emiiia/pokemon-evolution/issues"
   },
-  "homepage": "https://github.com/emiiia/pokemon-evolution#readme"
+  "homepage": "https://github.com/emiiia/pokemon-evolution#readme",
+  "devDependencies": {
+    "@types/node": "^20.5.0"
+  }
 }
