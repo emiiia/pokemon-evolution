@@ -1,5 +1,11 @@
 const axios = require("axios");
 
+/**
+ * Converts the evolution chain JSON response to a nested object of names and variations
+ * 
+ * @param chain  Chain JSON response from the evolution chain API
+ * @returns Object of species names and variations
+ */
 const parseChain: any = (chain: any) => {
   let variations = [];
   // Pokemon can have multiple variations for the next evolution (e.g. Eevee)
@@ -14,7 +20,12 @@ const parseChain: any = (chain: any) => {
   };
 };
 
-const getEvolutionChain = async (pokemonName: string) => {
+/**
+ * 
+ * @param pokemonName Name of the Pokemon
+ * @returns Evolution chain API URL of the given Pokemon
+ */
+const fetchPokemonSpecies = async (pokemonName: string) => {
   try {
     const responseSpecies = await axios.get(
       `https://pokeapi.co/api/v2/pokemon-species/${pokemonName.toLowerCase()}`
@@ -23,25 +34,57 @@ const getEvolutionChain = async (pokemonName: string) => {
     // Get the url for the evolution chain API
     const evolutionChainAPI = responseSpecies.data["evolution_chain"]["url"];
 
+    return evolutionChainAPI;
+  } catch (error) {
+    const errorMessage = `Failed to fetch species. ${error}`;
+    throw new Error(errorMessage);
+  }
+}
+
+/**
+ * 
+ * @param url URL to fetch the evolution chain
+ * @returns Chain JSON response from the evolution chain API
+ */
+const fetchEvolutionChain = async (url: string) => {
+  try {
     // Get the chain JSON
-    const responseEvolution = await axios.get(evolutionChainAPI);
+    const responseEvolution = await axios.get(url);
     const chain = responseEvolution.data["chain"];
+    return chain;
+  } catch (error) {
+    const errorMessage = `Failed to fetch evolution chain data with URL ${url}. ${error}`;
+    throw new Error(errorMessage);
+  }
+}
+
+/**
+ * Returns the full evolution chain of a given Pokemon
+ * 
+ * @param pokemonName Name of the Pokemon
+ * @returns JSON string of species names and variations
+ */
+const getEvolutionChain = async (pokemonName: string) => {
+  try {
+    // API requests
+   const evolutionChainAPI = await fetchPokemonSpecies(pokemonName);
+   const chain = await fetchEvolutionChain(evolutionChainAPI);
 
     // Parse the response into a format showing names and variations
     const evolutionChain = parseChain(chain);
 
-    // Stringify and format the chain result for readability
+    // Convert to JSON string and format the chain result for readability
     const formattedChain = JSON.stringify(evolutionChain, null, 4);
 
     console.log(formattedChain);
 
     return formattedChain;
   } catch (error) {
-    console.error(`Error fetching data for ${pokemonName}: ${error}`);
+    console.error(`Error fetching data for Pokemon "${pokemonName}":\n${error}`);
     return null;
   }
 };
 
-// getEvolutionChain("eevee");
+// getEvolutionChain("notvalid");
 
 module.exports = getEvolutionChain;

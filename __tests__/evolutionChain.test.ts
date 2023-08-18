@@ -101,4 +101,15 @@ describe("Evolution Chain Tests", () => {
     // Variations array should be empty
     expect(result).toEqual(JSON.stringify(spiritombChain, null, 4));
   });
+
+  it("should return null when an error is thrown", async () => {
+    // Mock API to return an empty object
+    mockAPI({});
+
+    // Invalid API response from e.g. invalid Pokemon name
+    const result = await getEvolutionChain("notapokemon");
+
+    // Result should be null
+    expect(result).toEqual(null);
+  });
 });
