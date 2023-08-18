@@ -23,14 +23,14 @@ const getEvolutionChain = async (pokemonName: string) => {
     // Get the url for the evolution chain API
     const evolutionChainAPI = responseSpecies.data["evolution_chain"]["url"];
 
-    const responseEvolution = await axios.get(evolutionChainAPI);
-
     // Get the chain JSON
+    const responseEvolution = await axios.get(evolutionChainAPI);
     const chain = responseEvolution.data["chain"];
 
     // Parse the response into a format showing names and variations
     const evolutionChain = parseChain(chain);
 
+    // Stringify and format the chain result for readability
     const formattedChain = JSON.stringify(evolutionChain, null, 4);
 
     console.log(formattedChain);
@@ -42,6 +42,6 @@ const getEvolutionChain = async (pokemonName: string) => {
   }
 };
 
-getEvolutionChain("eevee");
+// getEvolutionChain("eevee");
 
 module.exports = getEvolutionChain;
