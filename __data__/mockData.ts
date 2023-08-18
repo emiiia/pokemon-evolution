@@ -1,3 +1,5 @@
+// JSON response mock data used by evolutionChain.test.ts for the evolution-chain API 
+
 export const caterpieJSON = {
   chain: {
     evolves_to: [

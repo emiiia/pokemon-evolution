@@ -1,3 +1,5 @@
+// Expected chain results from getEvolutionChain used by evolutionChain.test.ts
+
 export const caterpieChain = {
   name: "caterpie",
   variations: [
