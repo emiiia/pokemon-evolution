@@ -1,13 +1,25 @@
 const axios = require("axios");
 const NodeCache = require( "node-cache" ); 
 
+interface Chain {
+  evolves_to: Chain[];
+  species: {
+    name: string;
+  };
+}
+
+interface EvolutionChain {
+  name: string;
+  variations: EvolutionChain[];
+}
+
 /**
  * Converts the evolution chain JSON response to a nested object of names and variations
  * 
  * @param chain  Chain JSON response from the evolution chain API
  * @returns Object of species names and variations
  */
-const parseChain: any = (chain: any) => {
+const parseChain = (chain: Chain): EvolutionChain => {
   let variations = [];
   // Pokemon can have multiple variations for the next evolution (e.g. Eevee)
   for (let i = 0; i < chain.evolves_to.length; i++) {
