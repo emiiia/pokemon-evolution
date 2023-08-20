@@ -1,4 +1,5 @@
 const axios = require("axios");
+const NodeCache = require( "node-cache" ); 
 
 /**
  * Converts the evolution chain JSON response to a nested object of names and variations
@@ -65,6 +66,11 @@ const fetchEvolutionChain = async (url: string) => {
  * @returns JSON string of species names and variations
  */
 const getEvolutionChain = async (pokemonName: string) => {
+  // Check if chain result has been cached for this pokemon 
+  if (chainCache.has(pokemonName)) {
+    return chainCache;
+  } 
+
   try {
     // API requests
    const evolutionChainAPI = await fetchPokemonSpecies(pokemonName);
@@ -76,6 +82,9 @@ const getEvolutionChain = async (pokemonName: string) => {
     // Convert to JSON string and format the chain result for readability
     const formattedChain = JSON.stringify(evolutionChain, null, 4);
 
+    // Set chain in cache
+    chainCache.set(pokemonName, formattedChain);
+
     console.log(formattedChain);
 
     return formattedChain;
@@ -85,6 +94,8 @@ const getEvolutionChain = async (pokemonName: string) => {
   }
 };
 
-// getEvolutionChain("notvalid");
+// Set up caching to avoid unnecessary API calls
+const chainCache = new NodeCache({stdTTL: 10});
+getEvolutionChain("burmy");
 
 module.exports = getEvolutionChain;
