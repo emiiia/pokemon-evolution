@@ -1,5 +1,7 @@
 const axios = require("axios");
 const NodeCache = require( "node-cache" ); 
+const prompt = require('prompt-sync')({sigint: true});
+
 
 interface Chain {
   evolves_to: Chain[];
@@ -77,10 +79,10 @@ const fetchEvolutionChain = async (url: string) => {
  * @param pokemonName Name of the Pokemon
  * @returns JSON string of species names and variations
  */
-const getEvolutionChain = async (pokemonName: string) => {
+const getEvolutionChain = async (pokemonName: string, chainCache: typeof NodeCache) => {
   // Check if chain result has been cached for this pokemon 
   if (chainCache.has(pokemonName)) {
-    return chainCache;
+    return chainCache.get(pokemonName);
   } 
 
   try {
@@ -96,9 +98,6 @@ const getEvolutionChain = async (pokemonName: string) => {
 
     // Set chain in cache
     chainCache.set(pokemonName, formattedChain);
-
-    console.log(formattedChain);
-
     return formattedChain;
   } catch (error) {
     console.error(`Error fetching data for Pokemon "${pokemonName}":\n${error}`);
@@ -106,8 +105,20 @@ const getEvolutionChain = async (pokemonName: string) => {
   }
 };
 
-// Set up caching to avoid unnecessary API calls
-const chainCache = new NodeCache({stdTTL: 10});
-getEvolutionChain("burmy");
+const main = async () => {
+  // Set up caching to avoid unnecessary API calls
+  const chainCache = new NodeCache({stdTTL: 20});
+
+  while (true) {
+    const pokemonName = await prompt('Enter your Pokemon here: ');
+    const chain = await getEvolutionChain(pokemonName, chainCache);
+    console.log(chain);
+  }
+}
+
+
+if (typeof require !== 'undefined' && require.main === module) {
+  main();
+}
 
 module.exports = getEvolutionChain;
