@@ -79,18 +79,13 @@ const fetchEvolutionChain = async (url: string) => {
  * @param pokemonName Name of the Pokemon
  * @returns JSON string of species names and variations
  */
-const getEvolutionChain = async (pokemonName: string, chainCache: typeof NodeCache) => {
+const getEvolutionChain = async (pokemonName: string) => {
   try {
     // Ensure valid string has been given
     const re = new RegExp("^[a-zA-Z]+$");
     if (!(re.test(pokemonName))) {
       throw new Error('Please enter a valid Pokemon name.');
     }
-
-    // Check if chain result has been cached for this pokemon 
-    if (chainCache.has(pokemonName)) {
-      return chainCache.get(pokemonName);
-    } 
 
     // API requests
    const evolutionChainAPI = await fetchPokemonSpecies(pokemonName);
@@ -101,9 +96,6 @@ const getEvolutionChain = async (pokemonName: string, chainCache: typeof NodeCac
 
     // Convert to JSON string and format the chain result for readability
     const formattedChain = JSON.stringify(evolutionChain, null, 4);
-
-    // Set chain in cache
-    chainCache.set(pokemonName, formattedChain);
     return formattedChain;
   } catch (error) {
     console.error(`\nError getting chain for Pokemon "${pokemonName}":\n${error}\n`);
@@ -115,9 +107,20 @@ const main = async () => {
   // Set up caching to avoid unnecessary API calls
   const chainCache = new NodeCache({stdTTL: 20});
 
+  let chain;
   while (true) {
     const pokemonName = await prompt('Enter your Pokemon here: ');
-    const chain = await getEvolutionChain(pokemonName, chainCache);
+
+    // Check if chain result has been cached for this pokemon 
+    if (chainCache.has(pokemonName)) {
+      chain = chainCache.get(pokemonName);
+    } else {
+      // Get chain using the API
+      chain = await getEvolutionChain(pokemonName);
+      // Set chain in cache
+      chainCache.set(pokemonName, chain);
+    }
+
     chain && console.log(chain);
   }
 }
