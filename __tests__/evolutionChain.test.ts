@@ -102,12 +102,23 @@ describe("Evolution Chain Tests", () => {
     expect(result).toEqual(JSON.stringify(spiritombChain, null, 4));
   });
 
-  it("should return null when an error is thrown", async () => {
+  it("should return null when an error is thrown for an unknown pokemon", async () => {
     // Mock API to return an empty object
     mockAPI({});
 
     // Invalid API response from e.g. invalid Pokemon name
     const result = await getEvolutionChain("notapokemon");
+
+    // Result should be null
+    expect(result).toEqual(null);
+  });
+  
+  it("should return null when an invalid string is given", async () => {
+    // Mock API to return an empty object
+    mockAPI({});
+
+    // Number is given
+    const result = await getEvolutionChain("123");
 
     // Result should be null
     expect(result).toEqual(null);
