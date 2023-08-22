@@ -80,12 +80,18 @@ const fetchEvolutionChain = async (url: string) => {
  * @returns JSON string of species names and variations
  */
 const getEvolutionChain = async (pokemonName: string, chainCache: typeof NodeCache) => {
-  // Check if chain result has been cached for this pokemon 
-  if (chainCache.has(pokemonName)) {
-    return chainCache.get(pokemonName);
-  } 
-
   try {
+    // Ensure valid string has been given
+    const re = new RegExp("^[a-zA-Z]+$");
+    if (!(re.test(pokemonName))) {
+      throw new Error('Please enter a valid Pokemon name.');
+    }
+
+    // Check if chain result has been cached for this pokemon 
+    if (chainCache.has(pokemonName)) {
+      return chainCache.get(pokemonName);
+    } 
+
     // API requests
    const evolutionChainAPI = await fetchPokemonSpecies(pokemonName);
    const chain = await fetchEvolutionChain(evolutionChainAPI);
@@ -100,7 +106,7 @@ const getEvolutionChain = async (pokemonName: string, chainCache: typeof NodeCac
     chainCache.set(pokemonName, formattedChain);
     return formattedChain;
   } catch (error) {
-    console.error(`Error fetching data for Pokemon "${pokemonName}":\n${error}`);
+    console.error(`\nError getting chain for Pokemon "${pokemonName}":\n${error}\n`);
     return null;
   }
 };
@@ -112,7 +118,7 @@ const main = async () => {
   while (true) {
     const pokemonName = await prompt('Enter your Pokemon here: ');
     const chain = await getEvolutionChain(pokemonName, chainCache);
-    console.log(chain);
+    chain && console.log(chain);
   }
 }
 
